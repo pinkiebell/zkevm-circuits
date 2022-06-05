@@ -1846,7 +1846,7 @@ checksum = "eabb4a44450da02c90444cf74558da904edde8fb4e9035a9a6a4e15445af0bd7"
 [[package]]
 name = "halo2_proofs"
 version = "0.1.0-beta.1"
-source = "git+https://github.com/privacy-scaling-explorations/halo2.git?tag=v2022_06_03#1fc67702da729b41bfeebc9764c4c6effbd1f9ad"
+source = "git+https://github.com/pinkiebell/halo2.git?rev=f9c8ae92644e56374054a4e3e8b0006e674f20de#f9c8ae92644e56374054a4e3e8b0006e674f20de"
 dependencies = [
  "blake2b_simd 1.0.0",
  "bumpalo",
