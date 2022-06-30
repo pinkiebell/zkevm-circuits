@@ -1,4 +1,4 @@
-use halo2_proofs::pairing::bn256::G1Affine;
+use halo2_proofs::pairing::bn256::{Bn256, G1Affine};
 use halo2_proofs::poly::commitment::Params;
 
 use std::collections::HashMap;
