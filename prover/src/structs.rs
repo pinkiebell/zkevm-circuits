@@ -36,3 +36,9 @@ pub struct Witness {
     pub randomness: eth_types::U256,
     pub input: eth_types::Bytes,
 }
+
+#[derive(Debug, Default, Clone, Copy, serde::Deserialize)]
+pub struct ProofRequestOptions {
+    /// Setups parameters on the fly
+    pub k: Option<u32>,
+}
