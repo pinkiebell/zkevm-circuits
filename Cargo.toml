@@ -20,7 +20,7 @@ members = [
 # is resolved: https://github.com/bitvecto-rs/bitvec/pull/141
 bitvec = { git = "https://github.com/ed255/bitvec.git", rev = "5cfc5fa8496c66872d21905e677120fc3e79693c" }
 #halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v2022_06_03" }
-halo2_proofs = { git = "https://github.com/pinkiebell/halo2.git", rev = "f9c8ae92644e56374054a4e3e8b0006e674f20de" }
+halo2_proofs = { git = "https://github.com/pinkiebell/halo2.git", rev = "bfe2142af350e09b7c37c0d7ba44186aa854ebc2" }
 
 # Definition of benchmarks profile to use.
 [profile.bench]
@@ -43,4 +43,4 @@ lto = "thin"
 incremental = false
 
 [patch."https://github.com/privacy-scaling-explorations/halo2.git"]
-halo2_proofs = { git = "https://github.com/pinkiebell/halo2.git", rev = "f9c8ae92644e56374054a4e3e8b0006e674f20de" }
+halo2_proofs = { git = "https://github.com/pinkiebell/halo2.git", rev = "bfe2142af350e09b7c37c0d7ba44186aa854ebc2" }
