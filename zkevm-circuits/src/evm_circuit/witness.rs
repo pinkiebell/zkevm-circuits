@@ -1251,10 +1251,7 @@ impl From<&circuit_input_builder::ExecStep> for ExecutionState {
                     OpcodeId::CALLDATALOAD => ExecutionState::CALLDATALOAD,
                     OpcodeId::CODESIZE => ExecutionState::CODESIZE,
                     OpcodeId::RETURN | OpcodeId::REVERT => ExecutionState::RETURN,
-                    _ => {
-                        println!("TODO: evm_circuit/witness unimplemented opcode {:?}", op);
-                        ExecutionState::STOP
-                    }
+                    _ => unimplemented!("unimplemented opcode {:?}", op),
                 }
             }
             circuit_input_builder::ExecState::BeginTx => ExecutionState::BeginTx,
