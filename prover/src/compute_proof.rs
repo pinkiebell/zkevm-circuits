@@ -150,8 +150,11 @@ pub async fn compute_proof(
 
     {
         // generate state_circuit proof
-        const N_ROWS: usize = 1 << 16;
-        let circuit = StateCircuit::<Fr, N_ROWS>::new(block.randomness, block.rws);
+
+        // reduce `k` to avoid:
+        // `k = N is too small for the given circuit. Try using a larger value of k`
+        let n_rows = 1 << (params.k - 1);
+        let circuit = StateCircuit::<Fr>::new(block.randomness, block.rws, n_rows);
 
         // TODO: same quest like in the first scope
         let vk = keygen_vk(params, &circuit)?;
