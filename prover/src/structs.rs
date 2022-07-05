@@ -36,3 +36,21 @@ pub struct Witness {
     pub randomness: eth_types::U256,
     pub input: eth_types::Bytes,
 }
+
+#[derive(Debug, Default, Clone, serde::Deserialize)]
+pub struct ProofRequestOptions {
+    /// the block number
+    pub block: u64,
+    /// the rpc url
+    pub rpc: String,
+    /// retry proof computation if error
+    pub retry: bool,
+    /// parameter file to use
+    pub param: String,
+}
+
+impl PartialEq for ProofRequestOptions {
+    fn eq(&self, other: &Self) -> bool {
+        self.block == other.block && self.rpc == other.rpc && self.param == other.param
+    }
+}
