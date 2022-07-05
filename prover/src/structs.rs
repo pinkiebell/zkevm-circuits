@@ -49,3 +49,9 @@ impl PartialEq for ProofRequestOptions {
         self.block == other.block && self.rpc == other.rpc && self.param == other.param
     }
 }
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct Witness {
+    pub randomness: eth_types::U256,
+    pub input: eth_types::Bytes,
+}
