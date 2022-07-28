@@ -12,6 +12,7 @@ use eth_types::{
     geth_types::Transaction, Address, Field, ToBigEndian, ToLittleEndian, ToScalar, Word,
 };
 use ff::PrimeField;
+pub use group::{Curve, Group};
 use group::GroupEncoding;
 use halo2_proofs::{
     circuit::{AssignedCell, Layouter, Region, SimpleFloorPlanner},
@@ -25,7 +26,7 @@ use num::Integer;
 use num_bigint::BigUint;
 // use rand_core::RngCore;
 use rlp::RlpStream;
-use secp256k1::Secp256k1Affine;
+pub use secp256k1::Secp256k1Affine;
 use sha3::{Digest, Keccak256};
 use sign_verify::{pk_bytes_swap_endianness, SignData, SignVerifyChip, SignVerifyConfig};
 pub use sign_verify::{POW_RAND_SIZE, VERIF_HEIGHT};
