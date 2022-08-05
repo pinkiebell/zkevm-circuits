@@ -12,7 +12,6 @@ use eth_types::{
     geth_types::Transaction, Address, Field, ToBigEndian, ToLittleEndian, ToScalar, Word,
 };
 use ff::PrimeField;
-pub use group::{Curve, Group};
 use group::GroupEncoding;
 use halo2_proofs::{
     circuit::{AssignedCell, Layouter, Region, SimpleFloorPlanner},
