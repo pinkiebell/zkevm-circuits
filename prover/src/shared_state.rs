@@ -1,3 +1,4 @@
+use halo2_proofs::pairing::bn256::Fr;
 use halo2_proofs::pairing::bn256::G1Affine;
 use halo2_proofs::plonk::create_proof;
 use halo2_proofs::plonk::ProvingKey;
@@ -215,12 +216,32 @@ impl SharedState {
                         .map_err(|e| e.to_string())?;
 
                         let time_started = Instant::now();
+
+                        let instance = match var("PROVERD_ENABLE_CIRCUIT_INSTANCE").unwrap_or_default().as_str() {
+                            "" | "0" | "false" => vec![],
+                            _ => {
+                                use zkevm_circuits::tx_circuit::POW_RAND_SIZE;
+                                use halo2_proofs::arithmetic::BaseExt;
+                                // TODO: This should come from the circuit `circuit.instance()`.
+                                let mut instance: Vec<Vec<Fr>>= (1..POW_RAND_SIZE + 1)
+                                    .map(|exp| vec![block.randomness.pow(&[exp as u64, 0, 0, 0]); param.n as usize])
+                                    .collect();
+                                // SignVerifyChip -> ECDSAChip -> MainGate instance column
+                                instance.push(vec![]);
+
+                                instance
+                            }
+                        };
+                        let instance: Vec<&[Fr]> = instance.iter().map(|e| e.as_slice()).collect();
+                        let instances = match instance.is_empty() {
+                            true => vec![],
+                            false => vec![instance.as_slice()],
+                        };
+
                         let circuit =
                             gen_circuit::<MAX_TXS, MAX_CALLDATA>(MAX_BYTECODE, block, txs)?;
                         let mut transcript = Blake2bWrite::<_, _, Challenge255<_>>::init(vec![]);
-                        // TODO: add instances in the future - leave it empty to make testing
-                        // 'possible'
-                        create_proof(&param, &pk, &[circuit], &[], OsRng, &mut transcript)
+                        create_proof(&param, &pk, &[circuit], &instances, OsRng, &mut transcript)
                             .map_err(|e| e.to_string())?;
 
                         (transcript.finalize(), param.k, Instant::now().duration_since(time_started).as_millis())
