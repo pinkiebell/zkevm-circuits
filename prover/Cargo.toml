@@ -24,3 +24,7 @@ zkevm-circuits = { path = "../zkevm-circuits" }
 mock = { path = "../mock" }
 ethers-signers = "0.6"
 ethers-core = "0.6"
+
+[features]
+default = []
+autogen = []

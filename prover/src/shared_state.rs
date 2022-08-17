@@ -193,8 +193,8 @@ impl SharedState {
                     gas_used,
                     {
                         log::info!(
-                            "Using circuit parameters: BLOCK_GAS_LIMIT={} MAX_TXS={} MAX_CALLDATA={} MAX_BYTECODE={} MIN_K={}",
-                            BLOCK_GAS_LIMIT, MAX_TXS, MAX_CALLDATA, MAX_BYTECODE, MIN_K
+                            "Using circuit parameters: BLOCK_GAS_LIMIT={} MAX_TXS={} MAX_CALLDATA={} MAX_BYTECODE={} MIN_K={} STATE_CIRCUIT_PAD_TO={}",
+                            BLOCK_GAS_LIMIT, MAX_TXS, MAX_CALLDATA, MAX_BYTECODE, MIN_K, STATE_CIRCUIT_PAD_TO
                         );
 
                         // try to automatically choose a file if the path ends with a `/`.
@@ -212,6 +212,7 @@ impl SharedState {
                             &param_path,
                             BLOCK_GAS_LIMIT,
                             MAX_BYTECODE,
+                            STATE_CIRCUIT_PAD_TO,
                         ).await
                         .map_err(|e| e.to_string())?;
 
@@ -383,10 +384,11 @@ impl SharedState {
         params_path: &str,
         block_gas_limit: usize,
         max_bytecode: usize,
+        state_circuit_pad_to: usize,
     ) -> Result<Arc<ProvingKey<G1Affine>>, Box<dyn std::error::Error>> {
         let cache_key = format!(
-            "{}{}{}{}{}",
-            params_path, MAX_TXS, MAX_CALLDATA, block_gas_limit, max_bytecode
+            "{}{}{}{}{}{}",
+            params_path, MAX_TXS, MAX_CALLDATA, block_gas_limit, max_bytecode, state_circuit_pad_to
         );
         let mut rw = self.rw.lock().await;
         if !rw.pk_cache.contains_key(&cache_key) {
@@ -394,8 +396,12 @@ impl SharedState {
             drop(rw);
 
             let param = self.load_param(params_path).await;
-            let pk =
-                gen_static_key::<MAX_TXS, MAX_CALLDATA>(&param, block_gas_limit, max_bytecode)?;
+            let pk = gen_static_key::<MAX_TXS, MAX_CALLDATA>(
+                &param,
+                block_gas_limit,
+                max_bytecode,
+                state_circuit_pad_to,
+            )?;
             let pk = Arc::new(pk);
 
             // acquire lock and update

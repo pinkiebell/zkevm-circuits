@@ -51,6 +51,7 @@ pub fn gen_static_key<const MAX_TXS: usize, const MAX_CALLDATA: usize>(
     params: &Params<G1Affine>,
     block_gas_limit: usize,
     max_bytecode: usize,
+    state_circuit_pad_to: usize,
 ) -> Result<ProvingKey<G1Affine>, Box<dyn std::error::Error>> {
     let history_hashes = vec![Word::zero(); 256];
     let mut eth_block: eth_types::Block<eth_types::Transaction> = eth_types::Block::default();
@@ -67,7 +68,8 @@ pub fn gen_static_key<const MAX_TXS: usize, const MAX_CALLDATA: usize>(
     let code_db = CodeDB::new();
     let chain_id = U256::from(99);
     let block = Block::new(chain_id, history_hashes, &eth_block)?;
-    let block = witness::block_convert(&block, &code_db);
+    let mut block = witness::block_convert(&block, &code_db);
+    block.state_circuit_pad_to = state_circuit_pad_to;
 
     let circuit = gen_circuit::<MAX_TXS, MAX_CALLDATA>(max_bytecode, block, txs)?;
     let vk = keygen_vk(params, &circuit)?;

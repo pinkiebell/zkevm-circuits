@@ -1,3 +1,5 @@
+#![cfg(feature = "autogen")]
+
 use bus_mapping::mock::BlockData;
 use env_logger::Env;
 use eth_types::bytecode;
@@ -298,6 +300,7 @@ macro_rules! estimate {
             let log2_ceil = |n| u32::BITS - (n as u32).leading_zeros() - (n & (n - 1) == 0) as u32;
             let k = log2_ceil(assembly.highest_row);
             let remaining_rows = (1 << k) - assembly.highest_row;
+            // TODO: verify remaining_rows is sufficient for state circuit
 
             $scope(
                 BLOCK_GAS_LIMIT,
@@ -314,7 +317,6 @@ macro_rules! estimate {
 
 /// Generates `circuit_autogen.rs` and prints a markdown table about
 /// SuperCircuit parameters.
-#[ignore]
 #[test]
 fn proverd_autogen() {
     env_logger::Builder::from_env(Env::default().default_filter_or("warn")).init();
@@ -335,7 +337,7 @@ fn proverd_autogen() {
     );
 
     // use a map to track the largest circuit parameters for `k`
-    let mut params = BTreeMap::<usize, (usize, usize, usize, usize)>::new();
+    let mut params = BTreeMap::<usize, (usize, usize, usize, usize, usize)>::new();
     let mut callback = |block_gas_limit,
                         max_txs,
                         max_calldata,
@@ -347,12 +349,22 @@ fn proverd_autogen() {
             "| {:15} | {:7} | {:12} | {:12} | {:12} | {:14} | {:2} |",
             block_gas_limit, max_txs, max_calldata, max_bytecode, highest_row, remaining_rows, k
         );
+        // TODO: worst-case calculation given `block_gas_limit`
+        let n = 1 << k as usize;
+        let state_circuit_pad_to = n - 256;
         params.insert(
             k as usize,
-            (block_gas_limit, max_txs, max_calldata, max_bytecode),
+            (
+                block_gas_limit,
+                max_txs,
+                max_calldata,
+                max_bytecode,
+                state_circuit_pad_to,
+            ),
         );
     };
 
+    estimate!(50_000, callback);
     estimate!(100_000, callback);
     estimate!(200_000, callback);
     estimate!(300_000, callback);
@@ -367,7 +379,8 @@ fn proverd_autogen() {
     // generate `circuit_autogen.rs`
     let mut prev_gas = 0;
     let mut str = String::new();
-    for (k, (block_gas_limit, max_txs, max_calldata, max_bytecode)) in params {
+    for (k, (block_gas_limit, max_txs, max_calldata, max_bytecode, state_circuit_pad_to)) in params
+    {
         write!(
             str,
             "{}..={} => {{
@@ -376,10 +389,18 @@ fn proverd_autogen() {
                 const MAX_CALLDATA: usize = {};
                 const MAX_BYTECODE: usize = {};
                 const MIN_K: usize = {};
+                const STATE_CIRCUIT_PAD_TO: usize = {};
                 $on_match
             }},
             ",
-            prev_gas, block_gas_limit, block_gas_limit, max_txs, max_calldata, max_bytecode, k
+            prev_gas,
+            block_gas_limit,
+            block_gas_limit,
+            max_txs,
+            max_calldata,
+            max_bytecode,
+            k,
+            state_circuit_pad_to,
         )
         .expect("fmt write");
         prev_gas = block_gas_limit + 1;
