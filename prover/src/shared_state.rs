@@ -225,7 +225,7 @@ impl SharedState {
                                 use halo2_proofs::arithmetic::BaseExt;
                                 // TODO: This should come from the circuit `circuit.instance()`.
                                 let mut instance: Vec<Vec<Fr>>= (1..POW_RAND_SIZE + 1)
-                                    .map(|exp| vec![block.randomness.pow(&[exp as u64, 0, 0, 0]); param.n as usize])
+                                    .map(|exp| vec![block.randomness.pow(&[exp as u64, 0, 0, 0]); param.n as usize - 64])
                                     .collect();
                                 // SignVerifyChip -> ECDSAChip -> MainGate instance column
                                 instance.push(vec![]);
